@@ -1,6 +1,8 @@
 let intervalID;
 let likes = new Map();
 
+const hiddenInput = document.createElement('input');
+
 document.addEventListener('DOMContentLoaded', () => {
   intervalID = setInterval(() => {
     document.getElementById('counter').innerHTML = parseInt(document.getElementById('counter').innerHTML) + 1;
@@ -49,3 +51,32 @@ document.getElementById('submit').addEventListener('click', event => {
   document.getElementById('list').appendChild(comment);
   document.getElementById('comment-input').value = '';
 });
+
+// Select the node that will be observed for mutations
+const targetNode = document.getElementById('counter');
+
+// Options for the observer (which mutations to observe)
+const config = { attributes: true, childList: true, subtree: true };
+
+// Callback function to execute when mutations are observed
+const callback = function(mutationsList, observer) {
+  // Use traditional 'for loops' for IE 11
+  for(const mutation of mutationsList) {
+    if (mutation.type === 'childList') {
+      const counterVal = document.getElementById('counter').innerHTML; 
+      document.getElementById('likes').firstChild && document.getElementById('likes').firstChild.remove();
+      const like = document.createElement('li');
+      like.innerHTML = `Number: ${counterVal}, Likes: ${likes.get(counterVal)}`
+      document.getElementById('likes').appendChild(like);
+    }
+  }
+};
+
+// Create an observer instance linked to the callback function
+const observer = new MutationObserver(callback);
+
+// Start observing the target node for configured mutations
+observer.observe(targetNode, config);
+
+// Later, you can stop observing
+// observer.disconnect();
